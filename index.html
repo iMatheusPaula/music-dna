@@ -3,167 +3,155 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>DNA Musical 🧬</title>
-<meta property="og:title" content="DNA Musical 🧬">
+<meta name="theme-color" content="#131312">
+<title>DNA Musical</title>
+<meta property="og:title" content="DNA Musical">
 <meta property="og:description" content="Ouça uns trechos e descubra o seu DNA musical.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0d0a1a;
-    --card: #1a1530;
-    --line: #2e2650;
-    --text: #f3f0ff;
-    --muted: #a59fc4;
-    --pink: #ff4fa3;
-    --cyan: #3ee6ff;
-    --lime: #b6ff4f;
+    --bg: #131312;
+    --panel: #1c1c1a;
+    --text: #f1efe9;
+    --muted: #8f8b83;
+    --line: #2e2d2a;
+    --accent: #7cb8ff;
     color-scheme: dark;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   body {
     min-height: 100dvh;
-    background: radial-gradient(1200px 600px at 10% -10%, #3a1460 0%, transparent 60%),
-                radial-gradient(900px 500px at 110% 10%, #0f3d5c 0%, transparent 55%),
-                var(--bg);
+    background: var(--bg);
     color: var(--text);
-    font-family: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
-    padding: max(20px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom));
+    font-family: -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
+    font-size: 17px;
+    padding: max(28px, env(safe-area-inset-top)) 20px max(32px, env(safe-area-inset-bottom));
   }
-  main { max-width: 480px; margin: 0 auto; }
+  main { max-width: 440px; margin: 0 auto; }
   [hidden] { display: none !important; }
-  h1 { font-size: 2.4rem; margin: .2em 0; line-height: 1.05; }
-  h2 { font-size: 1.5rem; margin: .3em 0; }
-  p { line-height: 1.5; }
+  h1 { font-size: 2.2rem; line-height: 1.05; letter-spacing: -.02em; margin: 0 0 .5em; }
+  h2 { font-size: 1.15rem; margin: 2em 0 .6em; }
+  p { line-height: 1.5; margin: 0 0 1em; }
   .muted { color: var(--muted); }
-  .grad { background: linear-gradient(90deg, var(--pink), var(--cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 20px; margin: 16px 0; }
-  button { font: inherit; cursor: pointer; border: 0; border-radius: 14px; color: var(--text); }
-  .btn { width: 100%; padding: 16px; font-size: 1.1rem; font-weight: 700; background: linear-gradient(90deg, var(--pink), #a34fff); }
-  .btn.ghost { background: transparent; border: 1px solid var(--line); font-weight: 600; }
-  .btn:active, .react:active { transform: scale(.97); }
-  input { width: 100%; padding: 14px; font: inherit; font-size: 1rem; border-radius: 12px; border: 1px solid var(--line); background: #120e24; color: var(--text); margin: 8px 0 16px; }
+  .small { font-size: .85rem; }
+  .hl { color: var(--accent); }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 24px 0; }
+
+  button { font: inherit; color: inherit; cursor: pointer; }
+  .btn { display: block; width: 100%; padding: 15px; border: 0; border-radius: 8px; background: var(--accent); color: #111; font-weight: 700; }
+  .btn.outline { background: transparent; color: var(--text); border: 1.5px solid var(--line); }
+  .btn:active { transform: scale(.98); }
+  .link { background: none; border: 0; padding: 4px 0; color: var(--muted); text-decoration: underline; font-size: .9rem; }
+
+  .eyebrow { text-transform: uppercase; letter-spacing: .08em; font-size: .72rem; color: var(--muted); margin-bottom: 8px; }
+  ul.legend { list-style: none; padding: 0; margin: 0 0 1.5em; }
+  ul.legend li { padding: 10px 0; border-bottom: 1px solid var(--line); }
+  ul.legend li span { display: inline-block; width: 2em; }
 
   /* jogo */
-  .top { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: .9rem; }
-  .progress { height: 6px; background: var(--line); border-radius: 6px; overflow: hidden; margin: 8px 0 20px; }
-  .progress > div { height: 100%; background: linear-gradient(90deg, var(--pink), var(--cyan)); width: 0; transition: width .3s; }
-  .disc { position: relative; width: min(64vw, 240px); aspect-ratio: 1; margin: 12px auto 20px; border-radius: 50%;
-          background: conic-gradient(from 0deg, #2a1f4d, #1a1530, #2a1f4d, #1a1530, #2a1f4d);
-          box-shadow: 0 0 60px #ff4fa355; display: grid; place-items: center; }
-  .disc.spin { animation: spin 3s linear infinite; }
-  .disc::after { content: ""; width: 26%; aspect-ratio: 1; border-radius: 50%; background: linear-gradient(135deg, var(--pink), var(--cyan)); }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .bars { display: flex; gap: 5px; justify-content: center; align-items: flex-end; height: 34px; margin-bottom: 8px; }
-  .bars i { width: 6px; background: var(--cyan); border-radius: 3px; height: 6px; }
-  .bars.on i { animation: eq .9s ease-in-out infinite; }
-  .bars i:nth-child(2) { animation-delay: -.3s; } .bars i:nth-child(3) { animation-delay: -.6s; }
-  .bars i:nth-child(4) { animation-delay: -.15s; } .bars i:nth-child(5) { animation-delay: -.45s; }
-  @keyframes eq { 0%,100% { height: 6px; } 50% { height: 34px; } }
-  .timebar { height: 4px; background: var(--line); border-radius: 4px; overflow: hidden; margin: 6px 0 4px; }
-  .timebar > div { height: 100%; width: 0; background: var(--lime); }
-  .reacts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 18px; }
-  .react { padding: 16px 4px; background: var(--card); border: 1px solid var(--line); font-size: 1rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-  .react b { font-size: 2rem; }
-  .small { font-size: .85rem; }
-  .center { text-align: center; }
-  .linkbtn { background: none; color: var(--muted); text-decoration: underline; padding: 6px; font-size: .9rem; }
+  .player { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 18px 10px; }
+  .phase { display: flex; justify-content: space-between; align-items: baseline; font-size: .8rem; color: var(--muted); margin-bottom: 8px; }
+  .phase b { color: var(--text); font-weight: 600; }
+  .segs { display: flex; gap: 3px; margin-bottom: 26px; }
+  .segs i { flex: 1; height: 5px; border-radius: 2px; background: var(--line); }
+  .segs i.done { background: var(--accent); }
+  .segs i.now { background: var(--text); animation: blink 1s ease-in-out infinite; }
+  @keyframes blink { 50% { opacity: .35; } }
+  .now { display: flex; align-items: center; gap: 12px; min-height: 2.6em; font-weight: 600; font-size: 1.05rem; line-height: 1.3; }
+  .eq { display: flex; gap: 3px; align-items: flex-end; height: 18px; flex: none; }
+  .eq i { width: 3px; height: 4px; background: var(--accent); }
+  .eq.on i { animation: eq .8s ease-in-out infinite; }
+  .eq i:nth-child(2) { animation-delay: -.25s; } .eq i:nth-child(3) { animation-delay: -.5s; }
+  @keyframes eq { 50% { height: 18px; } }
+  .seek { -webkit-appearance: none; appearance: none; width: 100%; height: 32px; margin: 8px 0 0; background: transparent; cursor: pointer; }
+  .seek::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--text) var(--p, 0%), var(--line) var(--p, 0%)); }
+  .seek::-moz-range-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--text) var(--p, 0%), var(--line) var(--p, 0%)); }
+  .seek::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; margin-top: -6px; border-radius: 50%; background: var(--text); }
+  .seek::-moz-range-thumb { width: 16px; height: 16px; border: 0; border-radius: 50%; background: var(--text); }
+  .player .link { display: block; margin: 0 auto; }
+  .reacts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 16px 0 12px; }
+  .react { padding: 18px 4px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: .85rem; font-weight: 600; }
+  .react span { font-size: 1.8rem; line-height: 1; }
+  .react:active { border-color: var(--accent); transform: scale(.97); }
 
   /* resultado */
-  .persona { font-size: 3.4rem; text-align: center; margin: 4px 0; }
-  .row { margin: 12px 0; }
-  .row .lbl { display: flex; justify-content: space-between; font-weight: 600; font-size: .95rem; gap: 8px; }
-  .row .bar { height: 10px; background: var(--line); border-radius: 10px; overflow: hidden; margin-top: 5px; }
-  .row .bar > div { height: 100%; border-radius: 10px; width: 0; transition: width 1s ease; }
-  .code { font-family: ui-monospace, Menlo, monospace; font-size: 1.1rem; letter-spacing: .1em; text-align: center; color: var(--lime); margin: 12px 0 0; }
-  .share { border: 2px dashed var(--pink); }
-  .verdict { text-align: center; border: 2px solid var(--lime); box-shadow: 0 0 40px #b6ff4f33; }
-  .verdict .big { font-size: 1.9rem; font-weight: 700; margin: 6px 0; line-height: 1.15; }
-  .secret { background: #2a0f1f; border: 2px solid var(--pink); text-align: center; }
-  .song { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--line); }
-  .song:last-child { border-bottom: 0; }
-  .song .r { font-size: 1.4rem; }
-  .song .meta { font-size: .8rem; color: var(--muted); margin-top: 2px; }
-  .tag { display: inline-block; font-size: .72rem; padding: 2px 8px; border-radius: 99px; background: var(--line); margin-top: 4px; }
-  .fade { animation: fade .5s ease; }
-  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .row { margin: 14px 0; }
+  .row .lbl { display: flex; justify-content: space-between; gap: 8px; font-size: .95rem; }
+  .row .bar { height: 6px; border-radius: 3px; background: var(--line); margin-top: 6px; overflow: hidden; }
+  .row .bar > div { height: 100%; width: 0; background: var(--muted); transition: width .8s ease; }
+  .row.top .bar > div { background: var(--accent); }
+  .row.top .lbl { font-weight: 700; }
+  .code { font-family: ui-monospace, Menlo, monospace; font-size: .8rem; color: var(--muted); margin-top: 16px; }
+  .note { border-left: 3px solid var(--accent); padding: 4px 0 4px 14px; margin: 0 0 28px; }
+  .verdict { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 22px 20px 8px; margin: 24px 0; }
+  .verdict .big { font-size: 1.8rem; font-weight: 800; line-height: 1.1; letter-spacing: -.01em; margin: 4px 0 12px; color: var(--accent); }
+  .song { display: grid; grid-template-columns: 32px 1fr; gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .song .r { font-size: 1.2rem; }
+  .song .meta { font-size: .8rem; color: var(--muted); margin-top: 3px; }
 </style>
 </head>
 <body>
 <main>
 
   <!-- INTRO -->
-  <section id="intro" class="fade">
-    <p class="muted" style="margin-bottom:0">🧬 teste rápido · 5 min · 🎧 use fone</p>
-    <h1>Descubra seu <span class="grad">DNA Musical</span></h1>
-    <p>Vão tocar uns trechos de música, <b>sem nome e sem artista</b>. É só reagir com sinceridade:</p>
-    <div class="card">
-      <p style="margin:0">🔥 <b>Amei</b>: aumenta o volume!<br>😐 <b>Ok</b>: nem fede nem cheira<br>❌ <b>Pula</b>: não é pra mim</p>
-    </div>
-    <p class="small muted">Não precisa ouvir até o fim: reagiu, passa pra próxima.</p>
-    <label for="name" class="small muted">Seu nome (vai aparecer no resultado)</label>
-    <input id="name" maxlength="30" placeholder="Ex: Matheus" autocomplete="given-name">
-    <button class="btn" id="start">▶ Começar</button>
+  <section id="intro">
+    <p class="eyebrow">5 minutos · fone recomendado · zero julgamento (mentira)</p>
+    <h1>Qual é o seu <span class="hl">DNA musical</span>?</h1>
+    <p>Vão tocar uns trechos de música. Sem nome, sem artista, sem pose. Só você e o seu ouvido.</p>
+    <ul class="legend">
+      <li><span>🔥</span>Solta o som</li>
+      <li><span>😐</span>Toca, mas não me chama</li>
+      <li><span>❌</span>Tira isso daqui</li>
+    </ul>
+    <p class="small muted">Pode arrastar a barra pra pular pro refrão. A gente não conta pra ninguém.</p>
+    <button class="btn" id="start">Bora</button>
   </section>
 
   <!-- JOGO -->
   <section id="game" hidden>
-    <div class="top"><span id="counter">Faixa 1</span><span>🧬 analisando…</span></div>
-    <div class="progress"><div id="prog"></div></div>
-    <div class="disc" id="disc"></div>
-    <div class="bars" id="bars"><i></i><i></i><i></i><i></i><i></i></div>
-    <div class="timebar"><div id="time"></div></div>
-    <p class="center small muted" id="status">Carregando…</p>
-    <div class="reacts">
-      <button class="react" data-v="2"><b>🔥</b>Amei</button>
-      <button class="react" data-v="0"><b>😐</b>Ok</button>
-      <button class="react" data-v="-1"><b>❌</b>Pula</button>
+    <div class="player">
+      <div class="phase"><b id="phase">Aquecendo</b><span>progresso</span></div>
+      <div class="segs" id="segs"></div>
+      <div class="now"><div class="eq" id="eq"><i></i><i></i><i></i></div><span id="status">Carregando…</span></div>
+      <input type="range" id="seek" class="seek" min="0" max="1000" value="0" aria-label="Posição na música">
+      <button class="link" id="replay">volta do começo</button>
     </div>
-    <p class="center"><button class="linkbtn" id="replay">↺ ouvir de novo</button></p>
+    <div class="reacts">
+      <button class="react" data-v="2"><span>🔥</span>Solta o som</button>
+      <button class="react" data-v="0"><span>😐</span>Tanto faz</button>
+      <button class="react" data-v="-1"><span>❌</span>Tira isso</button>
+    </div>
   </section>
 
   <!-- RESULTADO -->
   <section id="result" hidden>
-    <p class="muted center" style="margin-bottom:0" id="resName"></p>
-    <h2 class="center">Seu DNA Musical</h2>
-    <div class="persona" id="pEmoji"></div>
-    <h1 class="center grad" id="pName" style="font-size:2rem"></h1>
-    <p class="center muted" id="pDesc"></p>
-
-    <div class="card" id="dnaBars"></div>
-
-    <div class="card share center">
-      <p style="margin-top:0"><b>📸 Tira print e manda no grupo!</b></p>
-      <button class="btn ghost" id="copy">📋 Copiar resultado</button>
-      <p class="code" id="code"></p>
-    </div>
-
-    <div class="card center">
-      <p style="margin-top:0">Quer saber o que esse DNA <b>realmente</b> significa?</p>
-      <button class="btn" id="reveal">🔓 Revelar</button>
-    </div>
+    <p class="eyebrow">Resultado do exame</p>
+    <h1 id="pName" class="hl"></h1>
+    <p id="pDesc"></p>
+    <div id="dnaBars"></div>
+    <p class="code" id="code"></p>
+    <hr>
+    <p>Agora a parte que a gente não te contou.</p>
+    <button class="btn" id="reveal">Revelar</button>
   </section>
 
   <!-- REVELAÇÃO -->
-  <section id="twist" hidden class="fade">
-    <div class="card secret">
-      <p style="margin:0"><b>🤫 Pssiu! Não conta o segredo pra ninguém.</b><br>
-      Manda só o print do seu DNA Musical no grupo, nada de revelar isso aqui até todo mundo jogar!</p>
-    </div>
+  <section id="twist" hidden>
+    <p class="note small"><b>Pssiu.</b> Não conta pra ninguém até todo mundo jogar. Sério, a gente vai saber.</p>
 
-    <h2>Plot twist 😏</h2>
-    <p>Cada música que você ouviu tocou em um dia do <b>Lollapalooza</b> ou do <b>Ame Laroc</b>: nos sets reais dos DJs ou nos shows dos artistas. Seus ouvidos já decidiram por você…</p>
+    <p class="eyebrow">Pegadinha</p>
+    <h1>Você acabou de escolher seu dia de festival.</h1>
+    <p class="muted">Cada música tocou em um dia do <b>Lollapalooza</b> ou do <b>Ame Laroc</b>, nos sets reais dos DJs ou nos shows dos artistas. Seu ouvido não mente.</p>
 
-    <div class="card verdict" id="verdict"></div>
+    <div class="verdict" id="verdict"></div>
 
-    <h2>Seu ranking de dias</h2>
-    <div class="card" id="ranking"></div>
+    <h2>Ranking oficial (e incontestável)</h2>
+    <div id="ranking"></div>
 
     <h2>O que tocou pra você</h2>
-    <div class="card" id="songs"></div>
+    <div id="songs"></div>
 
-    <button class="btn ghost" id="back">← Voltar pro meu DNA</button>
+    <p style="margin-top:28px"><button class="btn outline" id="back">Voltar pro meu DNA</button></p>
   </section>
 
 </main>
@@ -171,20 +159,26 @@
 <script src="tracks.js"></script>
 <script>
 const DAYS = {
-  "lolla-sex": { day: "Lollapalooza · Sexta",  short: "Lolla Sexta",  emoji: "🎸", persona: "Caos de Festival",   desc: "Do rock ao drop em 5 minutos. Você quer tudo, ao mesmo tempo.", color: "#ff8a3d", artists: "Guetta, Sombr, Cage The Elephant, Snow Strippers, Cat Dealers" },
-  "lolla-sab": { day: "Lollapalooza · Sábado", short: "Lolla Sábado", emoji: "🎛️", persona: "Groove Underground", desc: "Grave quebrado, UK garage e aquele groove que ninguém sabe o nome.", color: "#3ee6ff", artists: "Four Tet, Sammy Virji" },
-  "lolla-dom": { day: "Lollapalooza · Domingo",short: "Lolla Domingo",emoji: "🖤", persona: "Rave Sombria",       desc: "Estrobo, roupa preta e hino pop no meio do caos.", color: "#ff4fa3", artists: "Charli XCX, The Neighbourhood, The Prodigy, Raye, Boys Noize, Marlon Hoffstadt…" },
-  "ame-sab":   { day: "Ame Laroc · Sábado",    short: "Ame Sábado",   emoji: "🌅", persona: "Sunset House",       desc: "Pôr do sol, house pra cima e braço pro alto.", color: "#ffd23e", artists: "Alesso, Bob Sinclar, Kungs, Öwnboss, Schillist" },
-  "ame-seg":   { day: "Ame Laroc · Segunda",   short: "Ame Segunda",  emoji: "🌌", persona: "Trance Eterno",      desc: "Mão no coração, olho fechado, euforia a 138 BPM.", color: "#a34fff", artists: "Armin van Buuren" },
+  "lolla-sex": { day: "Lollapalooza, sexta",  short: "Lolla sexta",  persona: "Caos de Festival",   desc: "Rock, drop e hino de estádio no mesmo dia. Você não escolhe gênero, você escolhe tudo.", artists: "Guetta, Sombr, Cage The Elephant, Snow Strippers, Cat Dealers" },
+  "lolla-sab": { day: "Lollapalooza, sábado", short: "Lolla sábado", persona: "Groove Underground", desc: "Você curte a faixa que ninguém sabe o nome. E vai fazer questão de dizer que conhecia antes.", artists: "Four Tet, Sammy Virji" },
+  "lolla-dom": { day: "Lollapalooza, domingo",short: "Lolla domingo",persona: "Rave Sombria",       desc: "Roupa preta, estrobo na cara e grito em hino pop. Terapia é cara, rave não.", artists: "Charli XCX, The Neighbourhood, The Prodigy, Raye, Boys Noize, Marlon Hoffstadt…" },
+  "ame-sab":   { day: "Ame Laroc, sábado",    short: "Ame sábado",   persona: "Sunset House",       desc: "Pôr do sol, copo na mão e braço pro alto em todo drop. Você é quem puxa o “uhuuul”.", artists: "Alesso, Bob Sinclar, Kungs, Öwnboss, Schillist" },
+  "ame-seg":   { day: "Ame Laroc, segunda",   short: "Ame segunda",  persona: "Trance Eterno",      desc: "Olho fechado, mão no peito, chorando a 138 BPM. Ninguém entende, só você.", artists: "Armin van Buuren" },
 };
 const ORDER = Object.keys(DAYS);           // ordem fixa usada no código
 const PER_DAY = 4;
 const REACT = { "2": "🔥", "0": "😐", "-1": "❌" };
+const PHASES = [[.2, "Aquecendo"], [.45, "Entrando na pista"], [.7, "No meio da muvuca"], [.9, "Já sem voz"], [1, "Último drop"]];
+const VIBES = [
+  "Sente o grave…", "Fecha o olho e imagina a pista", "Isso é bom ou é só nostalgia?", "Imagina isso às 3 da manhã",
+  "Sinceridade, hein", "Seu pé tá batendo?", "Respira, sente, julga", "Pensa bem antes de responder",
+  "Essa aqui divide opiniões", "Tá com cara de quem curtiu", "Ouve com o coração (e o fone)", "Cuidado que essa gruda",
+];
 
 const $ = id => document.getElementById(id);
 const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
-let queue = [], idx = 0, answers = [], player = new Audio(), name = "";
+let queue = [], idx = 0, answers = [], vibes = [], player = new Audio(), seeking = false;
 player.preload = "auto";
 
 function buildQueue() {
@@ -198,29 +192,39 @@ function show(id) {
 }
 
 $("start").onclick = () => {
-  name = $("name").value.trim();
   queue = buildQueue(); idx = 0; answers = [];
+  $("segs").innerHTML = "<i></i>".repeat(queue.length);
   show("game");
   playCurrent();
 };
 
 function playCurrent() {
   const t = queue[idx];
-  $("counter").textContent = `Faixa ${idx + 1} de ${queue.length}`;
-  $("prog").style.width = (idx / queue.length * 100) + "%";
+  if (!vibes.length) vibes = shuffle(VIBES);
+  setSeek(0);
+  [...$("segs").children].forEach((s, i) => s.className = i < idx ? "done" : i === idx ? "now" : "");
+  $("phase").textContent = PHASES.find(([f]) => idx / queue.length < f)[1];
   $("status").textContent = "Carregando…";
   player.src = t.u;
   player.currentTime = 0;
-  player.play().catch(() => { $("status").textContent = "Toque em ↺ para tocar"; });
+  player.play().catch(() => { $("status").textContent = "Toque em “volta do começo” pra tocar"; });
   // pré-carrega a próxima
   if (queue[idx + 1]) { const n = new Audio(); n.preload = "auto"; n.src = queue[idx + 1].u; }
 }
 
-player.addEventListener("playing", () => { $("status").textContent = "Tocando… 🎶"; $("disc").classList.add("spin"); $("bars").classList.add("on"); });
-player.addEventListener("pause", () => { $("disc").classList.remove("spin"); $("bars").classList.remove("on"); });
-player.addEventListener("ended", () => { $("status").textContent = "Acabou o trecho. E aí, curtiu?"; });
-player.addEventListener("timeupdate", () => { if (player.duration) $("time").style.width = (player.currentTime / player.duration * 100) + "%"; });
+player.addEventListener("playing", () => { if ($("status").textContent === "Carregando…" || $("status").textContent.startsWith("Toque")) $("status").textContent = vibes.pop(); $("eq").classList.add("on"); });
+player.addEventListener("pause", () => { $("eq").classList.remove("on"); });
+player.addEventListener("ended", () => { $("status").textContent = "Acabou o trecho. E aí, veredito?"; });
 player.addEventListener("error", () => { if (!$("game").hidden) next(); }); // prévia indisponível: pula sem contar
+player.addEventListener("timeupdate", () => { if (player.duration && !seeking) setSeek(player.currentTime / player.duration * 1000); });
+
+function setSeek(v) { $("seek").value = v; $("seek").style.setProperty("--p", v / 10 + "%"); }
+$("seek").addEventListener("input", e => { seeking = true; setSeek(e.target.value); });
+$("seek").addEventListener("change", e => {
+  seeking = false;
+  if (player.duration) player.currentTime = e.target.value / 1000 * player.duration;
+  if (player.paused) player.play();
+});
 
 $("replay").onclick = () => { player.currentTime = 0; player.play(); };
 
@@ -252,27 +256,17 @@ function showResult() {
   const top = sc.reduce((a, b) => (b.avg > a.avg ? b : a));
   const P = DAYS[top.d];
 
-  $("resName").textContent = name ? `${name}, este é o seu…` : "";
-  $("pEmoji").textContent = P.emoji;
   $("pName").textContent = P.persona;
   $("pDesc").textContent = P.desc;
 
   const rows = ORDER.map((d, i) => ({ d, p: pct[i] })).sort((a, b) => b.p - a.p);
-  $("dnaBars").innerHTML = rows.map(r =>
-    `<div class="row"><div class="lbl"><span>${DAYS[r.d].emoji} ${DAYS[r.d].persona}</span><span>${r.p}%</span></div>
-     <div class="bar"><div style="background:${DAYS[r.d].color}" data-w="${r.p}"></div></div></div>`).join("");
+  $("dnaBars").innerHTML = rows.map((r, i) =>
+    `<div class="row${i === 0 ? " top" : ""}"><div class="lbl"><span>${DAYS[r.d].persona}</span><span>${r.p}%</span></div>
+     <div class="bar"><div data-w="${r.p}"></div></div></div>`).join("");
 
   // código: 1 dígito (0–9) por dia, na ordem fixa ORDER
   const digits = sc.map(s => Math.max(0, Math.min(9, Math.round((s.avg + 1) / 3 * 9)))).join("");
-  const code = `#DNA-${digits}`;
-  $("code").textContent = code;
-
-  const txt = `🧬 Meu DNA Musical${name ? " (" + name + ")" : ""}: ${P.emoji} ${P.persona}\n` +
-    rows.map(r => `${DAYS[r.d].emoji} ${DAYS[r.d].persona} ${r.p}%`).join("\n") + `\n${code}`;
-  $("copy").onclick = async () => {
-    try { await navigator.clipboard.writeText(txt); $("copy").textContent = "✅ Copiado! Cola no grupo"; }
-    catch { $("copy").textContent = "Não deu pra copiar, manda print 📸"; }
-  };
+  $("code").textContent = `#${digits}`;
 
   show("result");
   requestAnimationFrame(() => setTimeout(() => document.querySelectorAll("#dnaBars [data-w]").forEach(el => el.style.width = el.dataset.w + "%"), 50));
@@ -288,35 +282,32 @@ function buildTwist() {
   let html;
 
   if (sc.every(s => s.avg >= 1)) {
-    html = `<div style="font-size:3rem">🎉</div><div class="big">Vai em TODOS!</div>
-      <p>Não tem jeito: você curtiu praticamente tudo. Você é rato de festival. Compra o passaporte e seja feliz.</p>`;
+    html = `<p class="eyebrow">Veredito</p><div class="big">Vai em todos.</div>
+      <p>Você curtiu praticamente tudo. Seu problema não é escolher o dia, é o boleto.</p>`;
   } else if (a.avg <= 0) {
-    html = `<div style="font-size:3rem">😅</div><div class="big">Talvez festival não seja a sua praia…</div>
-      <p>Mas o rolê é com a gente, então vem no dia que a galera escolher! Se for pra escolher um, o menos pior foi <b>${A.short}</b>.</p>`;
+    html = `<p class="eyebrow">Veredito</p><div class="big">Talvez festival não seja a sua praia.</div>
+      <p>Mas o rolê é com a gente, então você vai no dia que a galera escolher e pronto. Se servir de consolo, o menos pior foi <b>${A.short}</b>.</p>`;
   } else if (a.avg - b.avg >= 0.5) {
-    html = `<div style="font-size:3rem">${A.emoji}</div><p style="margin:0">Você PRECISA ir no</p>
-      <div class="big">${A.day}</div>
-      <p>Você deu 🔥 em <b>${a.loves} de ${a.n}</b> músicas desse dia.<br><span class="muted small">${A.artists}</span></p>`;
+    html = `<p class="eyebrow">Seus ouvidos decidiram</p><div class="big">${A.day}</div>
+      <p>Você deu 🔥 em ${a.loves} de ${a.n} músicas desse dia. Não tem nem discussão.</p>
+      <p class="muted small">${A.artists}</p>`;
   } else {
-    html = `<div style="font-size:3rem">⚖️</div><p style="margin:0">Você tá dividido entre</p>
-      <div class="big">${A.short} ${A.emoji} e ${B.short} ${B.emoji}</div>
-      <p>Os dois ficaram quase empatados. Se der, vai nos dois! Se não, olha o ranking abaixo.</p>`;
+    html = `<p class="eyebrow">Empate técnico</p><div class="big">${A.short} ou ${B.short}</div>
+      <p>Seu ouvido não conseguiu decidir. Solução óbvia: vai nos dois.</p>`;
   }
   $("verdict").innerHTML = html;
 
   $("ranking").innerHTML = sc.map((s, i) => {
     const D = DAYS[s.d], w = Math.round((s.avg + 1) / 3 * 100);
-    return `<div class="row"><div class="lbl"><span>${i + 1}. ${D.emoji} ${D.day}</span><span>${"🔥".repeat(s.loves) || "·"}</span></div>
-      <div class="small muted">${D.persona}</div>
-      <div class="bar"><div style="background:${D.color};width:${w}%"></div></div></div>`;
+    return `<div class="row${i === 0 ? " top" : ""}"><div class="lbl"><span>${i + 1}. ${D.day}</span><span class="muted small">${s.loves} 🔥</span></div>
+      <div class="bar"><div style="width:${w}%"></div></div></div>`;
   }).join("");
 
   const order = { 2: 0, 0: 1, "-1": 2 };
   $("songs").innerHTML = [...answers].sort((x, y) => order[x.v] - order[y.v]).map(s => `
     <div class="song"><span class="r">${REACT[s.v]}</span><div>
-      <div><b>${s.t}</b></div><div class="small">${s.a}</div>
-      <div class="meta">${s.o}</div>
-      ${s.d !== "isca" ? `<span class="tag">${DAYS[s.d].emoji} ${DAYS[s.d].day}</span>` : `<span class="tag">🪤 isca</span>`}
+      <div><b>${s.t}</b> · ${s.a}</div>
+      <div class="meta">${s.d !== "isca" ? DAYS[s.d].day + " · " : ""}${s.o}</div>
     </div></div>`).join("");
 }
 </script>
