@@ -1,4 +1,4 @@
-# whatday
+# music-dna
 
 Joguinho pra ajudar a galera a escolher em qual dia ir: 3 dias do Lollapalooza ou 2 do Ame Laroc.
 
