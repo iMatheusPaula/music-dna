@@ -218,12 +218,17 @@ function pickPart1() {
 const BONUS_ROUNDS = 1, ROUND_SIZE = 10;
 const PREC = [60, 100];                   // precisão ao fim da parte 1 e de cada rodada bônus
 const roundLabel = () => BONUS_ROUNDS > 1 ? `Rodada bônus ${round} de ${BONUS_ROUNDS}` : "Rodada bônus";
-// rodada bônus: 1 música de cada dia (parar entre rodadas nunca deixa um dia pra trás)
-// e completa com dias diferentes sorteados
+// rodada bônus: o mesmo número de músicas por dia, sempre hits primeiro. O que sobra
+// da parte 1 é bem diferente entre os dias (o Lolla domingo só tem hit sobrando), e
+// sortear no meio de tudo deixaria uns dias com mais hit (= mais 🔥) que outros
 function nextRound() {
-  const q = ORDER.filter(d => rest[d].length).map(d => rest[d].pop());
-  for (const d of shuffle(ORDER)) if (q.length < ROUND_SIZE && rest[d].length) q.push(rest[d].pop());
-  return shuffle(q);
+  const per = ROUND_SIZE / ORDER.length;
+  return shuffle(ORDER.flatMap(d => {
+    const pool = [...rest[d].filter(t => t.k === "hit"), ...rest[d].filter(t => t.k !== "hit")];
+    const pick = pool.slice(0, per);
+    rest[d] = rest[d].filter(t => !pick.includes(t));
+    return pick;
+  }));
 }
 const hasBonus = () => round < BONUS_ROUNDS && ORDER.some(d => rest[d].length);
 // durante a rodada, a precisão sobe música a música até o valor do fim da rodada
