@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DNA Musical 🧬</title>
+<meta property="og:title" content="DNA Musical 🧬">
+<meta property="og:description" content="Ouça uns trechos e descubra o seu DNA musical.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0a1a;
+    --card: #1a1530;
+    --line: #2e2650;
+    --text: #f3f0ff;
+    --muted: #a59fc4;
+    --pink: #ff4fa3;
+    --cyan: #3ee6ff;
+    --lime: #b6ff4f;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    min-height: 100dvh;
+    background: radial-gradient(1200px 600px at 10% -10%, #3a1460 0%, transparent 60%),
+                radial-gradient(900px 500px at 110% 10%, #0f3d5c 0%, transparent 55%),
+                var(--bg);
+    color: var(--text);
+    font-family: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: max(20px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom));
+  }
+  main { max-width: 480px; margin: 0 auto; }
+  [hidden] { display: none !important; }
+  h1 { font-size: 2.4rem; margin: .2em 0; line-height: 1.05; }
+  h2 { font-size: 1.5rem; margin: .3em 0; }
+  p { line-height: 1.5; }
+  .muted { color: var(--muted); }
+  .grad { background: linear-gradient(90deg, var(--pink), var(--cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 20px; margin: 16px 0; }
+  button { font: inherit; cursor: pointer; border: 0; border-radius: 14px; color: var(--text); }
+  .btn { width: 100%; padding: 16px; font-size: 1.1rem; font-weight: 700; background: linear-gradient(90deg, var(--pink), #a34fff); }
+  .btn.ghost { background: transparent; border: 1px solid var(--line); font-weight: 600; }
+  .btn:active, .react:active { transform: scale(.97); }
+  input { width: 100%; padding: 14px; font: inherit; font-size: 1rem; border-radius: 12px; border: 1px solid var(--line); background: #120e24; color: var(--text); margin: 8px 0 16px; }
+
+  /* jogo */
+  .top { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: .9rem; }
+  .progress { height: 6px; background: var(--line); border-radius: 6px; overflow: hidden; margin: 8px 0 20px; }
+  .progress > div { height: 100%; background: linear-gradient(90deg, var(--pink), var(--cyan)); width: 0; transition: width .3s; }
+  .disc { position: relative; width: min(64vw, 240px); aspect-ratio: 1; margin: 12px auto 20px; border-radius: 50%;
+          background: conic-gradient(from 0deg, #2a1f4d, #1a1530, #2a1f4d, #1a1530, #2a1f4d);
+          box-shadow: 0 0 60px #ff4fa355; display: grid; place-items: center; }
+  .disc.spin { animation: spin 3s linear infinite; }
+  .disc::after { content: ""; width: 26%; aspect-ratio: 1; border-radius: 50%; background: linear-gradient(135deg, var(--pink), var(--cyan)); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .bars { display: flex; gap: 5px; justify-content: center; align-items: flex-end; height: 34px; margin-bottom: 8px; }
+  .bars i { width: 6px; background: var(--cyan); border-radius: 3px; height: 6px; }
+  .bars.on i { animation: eq .9s ease-in-out infinite; }
+  .bars i:nth-child(2) { animation-delay: -.3s; } .bars i:nth-child(3) { animation-delay: -.6s; }
+  .bars i:nth-child(4) { animation-delay: -.15s; } .bars i:nth-child(5) { animation-delay: -.45s; }
+  @keyframes eq { 0%,100% { height: 6px; } 50% { height: 34px; } }
+  .timebar { height: 4px; background: var(--line); border-radius: 4px; overflow: hidden; margin: 6px 0 4px; }
+  .timebar > div { height: 100%; width: 0; background: var(--lime); }
+  .reacts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 18px; }
+  .react { padding: 16px 4px; background: var(--card); border: 1px solid var(--line); font-size: 1rem; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .react b { font-size: 2rem; }
+  .small { font-size: .85rem; }
+  .center { text-align: center; }
+  .linkbtn { background: none; color: var(--muted); text-decoration: underline; padding: 6px; font-size: .9rem; }
+
+  /* resultado */
+  .persona { font-size: 3.4rem; text-align: center; margin: 4px 0; }
+  .row { margin: 12px 0; }
+  .row .lbl { display: flex; justify-content: space-between; font-weight: 600; font-size: .95rem; gap: 8px; }
+  .row .bar { height: 10px; background: var(--line); border-radius: 10px; overflow: hidden; margin-top: 5px; }
+  .row .bar > div { height: 100%; border-radius: 10px; width: 0; transition: width 1s ease; }
+  .code { font-family: ui-monospace, Menlo, monospace; font-size: 1.1rem; letter-spacing: .1em; text-align: center; color: var(--lime); margin: 12px 0 0; }
+  .share { border: 2px dashed var(--pink); }
+  .verdict { text-align: center; border: 2px solid var(--lime); box-shadow: 0 0 40px #b6ff4f33; }
+  .verdict .big { font-size: 1.9rem; font-weight: 700; margin: 6px 0; line-height: 1.15; }
+  .secret { background: #2a0f1f; border: 2px solid var(--pink); text-align: center; }
+  .song { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .song:last-child { border-bottom: 0; }
+  .song .r { font-size: 1.4rem; }
+  .song .meta { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+  .tag { display: inline-block; font-size: .72rem; padding: 2px 8px; border-radius: 99px; background: var(--line); margin-top: 4px; }
+  .fade { animation: fade .5s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+<main>
+
+  <!-- INTRO -->
+  <section id="intro" class="fade">
+    <p class="muted" style="margin-bottom:0">🧬 teste rápido · 5 min · 🎧 use fone</p>
+    <h1>Descubra seu <span class="grad">DNA Musical</span></h1>
+    <p>Vão tocar uns trechos de música, <b>sem nome e sem artista</b>. É só reagir com sinceridade:</p>
+    <div class="card">
+      <p style="margin:0">🔥 <b>Amei</b>: aumenta o volume!<br>😐 <b>Ok</b>: nem fede nem cheira<br>❌ <b>Pula</b>: não é pra mim</p>
+    </div>
+    <p class="small muted">Não precisa ouvir até o fim: reagiu, passa pra próxima.</p>
+    <label for="name" class="small muted">Seu nome (vai aparecer no resultado)</label>
+    <input id="name" maxlength="30" placeholder="Ex: Matheus" autocomplete="given-name">
+    <button class="btn" id="start">▶ Começar</button>
+  </section>
+
+  <!-- JOGO -->
+  <section id="game" hidden>
+    <div class="top"><span id="counter">Faixa 1</span><span>🧬 analisando…</span></div>
+    <div class="progress"><div id="prog"></div></div>
+    <div class="disc" id="disc"></div>
+    <div class="bars" id="bars"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="timebar"><div id="time"></div></div>
+    <p class="center small muted" id="status">Carregando…</p>
+    <div class="reacts">
+      <button class="react" data-v="2"><b>🔥</b>Amei</button>
+      <button class="react" data-v="0"><b>😐</b>Ok</button>
+      <button class="react" data-v="-1"><b>❌</b>Pula</button>
+    </div>
+    <p class="center"><button class="linkbtn" id="replay">↺ ouvir de novo</button></p>
+  </section>
+
+  <!-- RESULTADO -->
+  <section id="result" hidden>
+    <p class="muted center" style="margin-bottom:0" id="resName"></p>
+    <h2 class="center">Seu DNA Musical</h2>
+    <div class="persona" id="pEmoji"></div>
+    <h1 class="center grad" id="pName" style="font-size:2rem"></h1>
+    <p class="center muted" id="pDesc"></p>
+
+    <div class="card" id="dnaBars"></div>
+
+    <div class="card share center">
+      <p style="margin-top:0"><b>📸 Tira print e manda no grupo!</b></p>
+      <button class="btn ghost" id="copy">📋 Copiar resultado</button>
+      <p class="code" id="code"></p>
+    </div>
+
+    <div class="card center">
+      <p style="margin-top:0">Quer saber o que esse DNA <b>realmente</b> significa?</p>
+      <button class="btn" id="reveal">🔓 Revelar</button>
+    </div>
+  </section>
+
+  <!-- REVELAÇÃO -->
+  <section id="twist" hidden class="fade">
+    <div class="card secret">
+      <p style="margin:0"><b>🤫 Pssiu! Não conta o segredo pra ninguém.</b><br>
+      Manda só o print do seu DNA Musical no grupo, nada de revelar isso aqui até todo mundo jogar!</p>
+    </div>
+
+    <h2>Plot twist 😏</h2>
+    <p>Cada música que você ouviu tocou em um dia do <b>Lollapalooza</b> ou do <b>Ame Laroc</b>: nos sets reais dos DJs ou nos shows dos artistas. Seus ouvidos já decidiram por você…</p>
+
+    <div class="card verdict" id="verdict"></div>
+
+    <h2>Seu ranking de dias</h2>
+    <div class="card" id="ranking"></div>
+
+    <h2>O que tocou pra você</h2>
+    <div class="card" id="songs"></div>
+
+    <button class="btn ghost" id="back">← Voltar pro meu DNA</button>
+  </section>
+
+</main>
+
+<script src="tracks.js"></script>
+<script>
+const DAYS = {
+  "lolla-sex": { day: "Lollapalooza · Sexta",  short: "Lolla Sexta",  emoji: "🎸", persona: "Caos de Festival",   desc: "Do rock ao drop em 5 minutos. Você quer tudo, ao mesmo tempo.", color: "#ff8a3d", artists: "Guetta, Sombr, Cage The Elephant, Snow Strippers, Cat Dealers" },
+  "lolla-sab": { day: "Lollapalooza · Sábado", short: "Lolla Sábado", emoji: "🎛️", persona: "Groove Underground", desc: "Grave quebrado, UK garage e aquele groove que ninguém sabe o nome.", color: "#3ee6ff", artists: "Four Tet, Sammy Virji" },
+  "lolla-dom": { day: "Lollapalooza · Domingo",short: "Lolla Domingo",emoji: "🖤", persona: "Rave Sombria",       desc: "Estrobo, roupa preta e hino pop no meio do caos.", color: "#ff4fa3", artists: "Charli XCX, The Neighbourhood, The Prodigy, Raye, Boys Noize, Marlon Hoffstadt…" },
+  "ame-sab":   { day: "Ame Laroc · Sábado",    short: "Ame Sábado",   emoji: "🌅", persona: "Sunset House",       desc: "Pôr do sol, house pra cima e braço pro alto.", color: "#ffd23e", artists: "Alesso, Bob Sinclar, Kungs, Öwnboss, Schillist" },
+  "ame-seg":   { day: "Ame Laroc · Segunda",   short: "Ame Segunda",  emoji: "🌌", persona: "Trance Eterno",      desc: "Mão no coração, olho fechado, euforia a 138 BPM.", color: "#a34fff", artists: "Armin van Buuren" },
+};
+const ORDER = Object.keys(DAYS);           // ordem fixa usada no código
+const PER_DAY = 4;
+const REACT = { "2": "🔥", "0": "😐", "-1": "❌" };
+
+const $ = id => document.getElementById(id);
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+let queue = [], idx = 0, answers = [], player = new Audio(), name = "";
+player.preload = "auto";
+
+function buildQueue() {
+  const picks = ORDER.flatMap(d => shuffle(TRACKS.filter(t => t.d === d)).slice(0, PER_DAY));
+  return shuffle([...picks, ...TRACKS.filter(t => t.d === "isca")]);
+}
+
+function show(id) {
+  for (const s of ["intro", "game", "result", "twist"]) $(s).hidden = s !== id;
+  window.scrollTo(0, 0);
+}
+
+$("start").onclick = () => {
+  name = $("name").value.trim();
+  queue = buildQueue(); idx = 0; answers = [];
+  show("game");
+  playCurrent();
+};
+
+function playCurrent() {
+  const t = queue[idx];
+  $("counter").textContent = `Faixa ${idx + 1} de ${queue.length}`;
+  $("prog").style.width = (idx / queue.length * 100) + "%";
+  $("status").textContent = "Carregando…";
+  player.src = t.u;
+  player.currentTime = 0;
+  player.play().catch(() => { $("status").textContent = "Toque em ↺ para tocar"; });
+  // pré-carrega a próxima
+  if (queue[idx + 1]) { const n = new Audio(); n.preload = "auto"; n.src = queue[idx + 1].u; }
+}
+
+player.addEventListener("playing", () => { $("status").textContent = "Tocando… 🎶"; $("disc").classList.add("spin"); $("bars").classList.add("on"); });
+player.addEventListener("pause", () => { $("disc").classList.remove("spin"); $("bars").classList.remove("on"); });
+player.addEventListener("ended", () => { $("status").textContent = "Acabou o trecho. E aí, curtiu?"; });
+player.addEventListener("timeupdate", () => { if (player.duration) $("time").style.width = (player.currentTime / player.duration * 100) + "%"; });
+player.addEventListener("error", () => { if (!$("game").hidden) next(); }); // prévia indisponível: pula sem contar
+
+$("replay").onclick = () => { player.currentTime = 0; player.play(); };
+
+document.querySelectorAll(".react").forEach(b => b.onclick = () => {
+  answers.push({ ...queue[idx], v: Number(b.dataset.v) });
+  next();
+});
+
+function next() {
+  idx++;
+  if (idx < queue.length) return playCurrent();
+  player.pause();
+  showResult();
+}
+
+function scores() {
+  return ORDER.map(d => {
+    const a = answers.filter(x => x.d === d);
+    const avg = a.length ? a.reduce((s, x) => s + x.v, 0) / a.length : 0;
+    return { d, avg, n: a.length, loves: a.filter(x => x.v === 2).length };
+  });
+}
+
+function showResult() {
+  const sc = scores();
+  const weights = sc.map(s => s.avg + 1.05);          // -1..2  →  >0
+  const total = weights.reduce((a, b) => a + b, 0);
+  const pct = weights.map(w => Math.round(w / total * 100));
+  const top = sc.reduce((a, b) => (b.avg > a.avg ? b : a));
+  const P = DAYS[top.d];
+
+  $("resName").textContent = name ? `${name}, este é o seu…` : "";
+  $("pEmoji").textContent = P.emoji;
+  $("pName").textContent = P.persona;
+  $("pDesc").textContent = P.desc;
+
+  const rows = ORDER.map((d, i) => ({ d, p: pct[i] })).sort((a, b) => b.p - a.p);
+  $("dnaBars").innerHTML = rows.map(r =>
+    `<div class="row"><div class="lbl"><span>${DAYS[r.d].emoji} ${DAYS[r.d].persona}</span><span>${r.p}%</span></div>
+     <div class="bar"><div style="background:${DAYS[r.d].color}" data-w="${r.p}"></div></div></div>`).join("");
+
+  // código: 1 dígito (0–9) por dia, na ordem fixa ORDER
+  const digits = sc.map(s => Math.max(0, Math.min(9, Math.round((s.avg + 1) / 3 * 9)))).join("");
+  const code = `#DNA-${digits}`;
+  $("code").textContent = code;
+
+  const txt = `🧬 Meu DNA Musical${name ? " (" + name + ")" : ""}: ${P.emoji} ${P.persona}\n` +
+    rows.map(r => `${DAYS[r.d].emoji} ${DAYS[r.d].persona} ${r.p}%`).join("\n") + `\n${code}`;
+  $("copy").onclick = async () => {
+    try { await navigator.clipboard.writeText(txt); $("copy").textContent = "✅ Copiado! Cola no grupo"; }
+    catch { $("copy").textContent = "Não deu pra copiar, manda print 📸"; }
+  };
+
+  show("result");
+  requestAnimationFrame(() => setTimeout(() => document.querySelectorAll("#dnaBars [data-w]").forEach(el => el.style.width = el.dataset.w + "%"), 50));
+}
+
+$("reveal").onclick = () => { buildTwist(); show("twist"); };
+$("back").onclick = () => show("result");
+
+function buildTwist() {
+  const sc = scores().sort((a, b) => b.avg - a.avg);
+  const [a, b] = sc;
+  const A = DAYS[a.d], B = DAYS[b.d];
+  let html;
+
+  if (sc.every(s => s.avg >= 1)) {
+    html = `<div style="font-size:3rem">🎉</div><div class="big">Vai em TODOS!</div>
+      <p>Não tem jeito: você curtiu praticamente tudo. Você é rato de festival. Compra o passaporte e seja feliz.</p>`;
+  } else if (a.avg <= 0) {
+    html = `<div style="font-size:3rem">😅</div><div class="big">Talvez festival não seja a sua praia…</div>
+      <p>Mas o rolê é com a gente, então vem no dia que a galera escolher! Se for pra escolher um, o menos pior foi <b>${A.short}</b>.</p>`;
+  } else if (a.avg - b.avg >= 0.5) {
+    html = `<div style="font-size:3rem">${A.emoji}</div><p style="margin:0">Você PRECISA ir no</p>
+      <div class="big">${A.day}</div>
+      <p>Você deu 🔥 em <b>${a.loves} de ${a.n}</b> músicas desse dia.<br><span class="muted small">${A.artists}</span></p>`;
+  } else {
+    html = `<div style="font-size:3rem">⚖️</div><p style="margin:0">Você tá dividido entre</p>
+      <div class="big">${A.short} ${A.emoji} e ${B.short} ${B.emoji}</div>
+      <p>Os dois ficaram quase empatados. Se der, vai nos dois! Se não, olha o ranking abaixo.</p>`;
+  }
+  $("verdict").innerHTML = html;
+
+  $("ranking").innerHTML = sc.map((s, i) => {
+    const D = DAYS[s.d], w = Math.round((s.avg + 1) / 3 * 100);
+    return `<div class="row"><div class="lbl"><span>${i + 1}. ${D.emoji} ${D.day}</span><span>${"🔥".repeat(s.loves) || "·"}</span></div>
+      <div class="small muted">${D.persona}</div>
+      <div class="bar"><div style="background:${D.color};width:${w}%"></div></div></div>`;
+  }).join("");
+
+  const order = { 2: 0, 0: 1, "-1": 2 };
+  $("songs").innerHTML = [...answers].sort((x, y) => order[x.v] - order[y.v]).map(s => `
+    <div class="song"><span class="r">${REACT[s.v]}</span><div>
+      <div><b>${s.t}</b></div><div class="small">${s.a}</div>
+      <div class="meta">${s.o}</div>
+      ${s.d !== "isca" ? `<span class="tag">${DAYS[s.d].emoji} ${DAYS[s.d].day}</span>` : `<span class="tag">🪤 isca</span>`}
+    </div></div>`).join("");
+}
+</script>
+</body>
+</html>
