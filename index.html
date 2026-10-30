@@ -56,6 +56,8 @@
   .segs i { flex: 1; height: 5px; border-radius: 2px; background: var(--line); }
   .segs i.done { background: var(--accent); }
   .segs i.now { background: var(--text); animation: blink 1s ease-in-out infinite; }
+  .tease { margin: -12px 0 18px; color: var(--accent); font-size: .9rem; font-weight: 600; animation: pop .4s ease; }
+  @keyframes pop { from { opacity: 0; transform: translateY(-4px); } }
   @keyframes blink { 50% { opacity: .35; } }
   .now { display: flex; align-items: center; gap: 12px; min-height: 2.6em; font-weight: 600; font-size: 1.05rem; line-height: 1.3; }
   .eq { display: flex; gap: 3px; align-items: flex-end; height: 18px; flex: none; }
@@ -81,6 +83,8 @@
   .row .bar > div { height: 100%; width: 0; background: var(--muted); transition: width .8s ease; }
   .row.top .bar > div { background: var(--accent); }
   .row.top .lbl { font-weight: 700; }
+  .center { text-align: center; }
+  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 28px; }
   .code { font-family: ui-monospace, Menlo, monospace; font-size: .8rem; color: var(--muted); margin-top: 16px; }
   .note { border-left: 3px solid var(--accent); padding: 4px 0 4px 14px; margin: 0 0 28px; }
   .verdict { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 22px 20px 8px; margin: 24px 0; }
@@ -110,8 +114,9 @@
   <!-- JOGO -->
   <section id="game" hidden>
     <div class="player">
-      <div class="phase"><b id="phase">Aquecendo</b><span>progresso</span></div>
+      <div class="phase"><b id="phase">Aquecendo</b><span id="phaseR">progresso</span></div>
       <div class="segs" id="segs"></div>
+      <p class="tease" id="tease" hidden></p>
       <div class="now"><div class="eq" id="eq"><i></i><i></i><i></i></div><span id="status">Carregando…</span></div>
       <input type="range" id="seek" class="seek" min="0" max="1000" value="0" aria-label="Posição na música">
       <button class="link" id="replay">volta do começo</button>
@@ -121,7 +126,18 @@
       <button class="react" data-v="0"><span>😐</span>Tanto faz</button>
       <button class="react" data-v="-1"><span>❌</span>Tira isso</button>
     </div>
-    <button class="link" id="stop" style="display:block;margin:0 auto" hidden>cansei, quero ver meu resultado</button>
+  </section>
+
+  <!-- FIM DE RODADA BÔNUS -->
+  <section id="round" hidden>
+    <p class="eyebrow" id="rTitle"></p>
+    <h1><span class="hl" id="rPrec"></span> de precisão</h1>
+    <p class="muted" id="rTxt"></p>
+    <div class="row top"><div class="bar"><div id="rBar"></div></div></div>
+    <div class="choices">
+      <button class="btn" id="again">Mais uma rodada</button>
+      <button class="btn outline" id="seeDna">Ver meu DNA</button>
+    </div>
   </section>
 
   <!-- RESULTADO -->
@@ -131,12 +147,6 @@
     <p id="pDesc"></p>
     <div id="dnaBars"></div>
     <p class="code" id="code"></p>
-    <div id="moreBox">
-      <hr>
-      <p class="eyebrow">Parte 2 · opcional</p>
-      <p id="moreTxt"></p>
-      <button class="btn outline" id="more">Quero mais músicas</button>
-    </div>
     <hr>
     <p>Agora a parte que a gente não te contou.</p>
     <button class="btn" id="reveal">Revelar</button>
@@ -176,7 +186,7 @@ const ORDER = Object.keys(DAYS);           // ordem fixa usada no código
 const PER_DAY = 4, HITS_PER_DAY = 1;     // parte 1: 3 faixas de set + 1 hit por dia
 const REACT = { "2": "🔥", "0": "😐", "-1": "❌" };
 const PHASES = [[.2, "Aquecendo"], [.45, "Entrando na pista"], [.7, "No meio da muvuca"], [.9, "Já sem voz"], [1, "Último drop"]];
-const PHASES2 = [[.25, "Hora extra"], [.5, "After"], [.75, "After do after"], [1, "Já é de manhã"]];
+const TEASE_FOR = 3;                      // quantas músicas a dica do meio da parte 1 fica na tela
 const VIBES = [
   "Sente o grave…", "Fecha o olho e imagina a pista", "Isso é bom ou é só nostalgia?", "Imagina isso às 3 da manhã",
   "Sinceridade, hein", "Seu pé tá batendo?", "Respira, sente, julga", "Pensa bem antes de responder",
@@ -188,6 +198,7 @@ const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { cons
 
 let queue = [], idx = 0, answers = [], vibes = [], player = new Audio(), seeking = false;
 let part = 1, rest = {};                  // rest: músicas de cada dia que ainda não tocaram
+let round = 0;                            // rodadas bônus já iniciadas (0 = ainda na parte 1)
 player.preload = "auto";
 
 function pickPart1() {
@@ -204,47 +215,76 @@ function pickPart1() {
   return shuffle([...picks, ...TRACKS.filter(t => t.d === "isca")]);
 }
 
-// parte 2: rodadas com 1 música de cada dia, então parar no meio nunca deixa um dia pra trás
-function pickPart2() {
-  const q = [];
-  while (ORDER.some(d => rest[d].length)) q.push(...shuffle(ORDER.filter(d => rest[d].length).map(d => rest[d].pop())));
-  return q;
+const BONUS_ROUNDS = 1, ROUND_SIZE = 10;
+const PREC = [60, 100];                   // precisão ao fim da parte 1 e de cada rodada bônus
+const roundLabel = () => BONUS_ROUNDS > 1 ? `Rodada bônus ${round} de ${BONUS_ROUNDS}` : "Rodada bônus";
+// rodada bônus: 1 música de cada dia (parar entre rodadas nunca deixa um dia pra trás)
+// e completa com dias diferentes sorteados
+function nextRound() {
+  const q = ORDER.filter(d => rest[d].length).map(d => rest[d].pop());
+  for (const d of shuffle(ORDER)) if (q.length < ROUND_SIZE && rest[d].length) q.push(rest[d].pop());
+  return shuffle(q);
 }
-
-const part2Left = () => part === 1 ? ORDER.reduce((n, d) => n + rest[d].length, 0) : queue.length - idx;
+const hasBonus = () => round < BONUS_ROUNDS && ORDER.some(d => rest[d].length);
+// durante a rodada, a precisão sobe música a música até o valor do fim da rodada
+const precision = () => part === 1 ? PREC[0]
+  : Math.round(PREC[round - 1] + (PREC[round] - PREC[round - 1]) * idx / queue.length);
 
 function show(id) {
-  for (const s of ["intro", "game", "result", "twist"]) $(s).hidden = s !== id;
+  for (const s of ["intro", "game", "round", "result", "twist"]) $(s).hidden = s !== id;
   window.scrollTo(0, 0);
 }
 
 function startQueue(q) {
   queue = q; idx = 0;
   $("segs").innerHTML = "<i></i>".repeat(queue.length);
-  resumeGame();
-}
-
-function resumeGame() {
-  $("stop").hidden = part !== 2;
   show("game");
   playCurrent();
 }
 
-$("start").onclick = () => { part = 1; answers = []; startQueue(pickPart1()); };
-
-$("more").onclick = () => {
-  if (part === 1) { part = 2; startQueue(pickPart2()); }
-  else resumeGame();                       // parou no meio da parte 2: continua de onde estava
+$("start").onclick = () => {
+  part = 1; answers = []; round = 0;
+  startQueue(pickPart1());
 };
 
-$("stop").onclick = () => { player.pause(); showResult(); };
+$("again").onclick = () => { part = 2; round++; startQueue(nextRound()); };
+$("seeDna").onclick = () => showResult();
+
+// tela de escolha: aparece no fim da parte 1 e de cada rodada bônus
+function roundEnd() {
+  const p = PREC[round], before = round ? PREC[round - 1] : 0, more = hasBonus();
+  $("rTitle").textContent = round ? `${roundLabel()} concluída` : "Primeira fase concluída";
+  $("rPrec").textContent = p + "%";
+  // provoca com o resultado real: empate pede desempate, favorito pede confirmação
+  const tie = isTie();
+  $("rTxt").textContent = !more ? "DNA sequenciado por completo. Agora não tem mais desculpa."
+    : !round ? (tie ? `Seu DNA tá dividido entre ${tiedWord()}. Só mais umas musiquinhas rapidinhas e a gente desempata 😉`
+                    : `Já dá pra ver um favorito… Só mais umas musiquinhas rapidinhas e fica confirmado 😉`)
+    : `+${p - before}% nessa rodada. ` + (tie ? `Mas ainda tá apertado entre ${tiedWord()}.` : "O favorito tá se firmando.");
+  $("again").hidden = !more;
+  $("again").textContent = !round ? (tie ? "Desempatar" : "Confirmar favorito") : tie ? "Desempate final" : "Última rodada";
+  $("seeDna").className = more ? "btn outline" : "btn";
+  $("rBar").style.transition = "none";
+  $("rBar").style.width = before + "%";
+  show("round");
+  requestAnimationFrame(() => setTimeout(() => { $("rBar").style.transition = ""; $("rBar").style.width = p + "%"; }, 50));
+}
 
 function playCurrent() {
   const t = queue[idx];
   if (!vibes.length) vibes = shuffle(VIBES);
   setSeek(0);
   [...$("segs").children].forEach((s, i) => s.className = i < idx ? "done" : i === idx ? "now" : "");
-  $("phase").textContent = (part === 1 ? PHASES : PHASES2).find(([f]) => idx / queue.length < f)[1];
+  $("phase").textContent = part === 1 ? PHASES.find(([f]) => idx / queue.length < f)[1] : roundLabel();
+  $("phaseR").textContent = part === 1 ? "progresso" : `precisão ${precision()}%`;
+  // no meio da parte 1, uma prévia do resultado pra puxar a segunda metade
+  const mid = Math.floor(queue.length / 2);
+  if (part === 1 && idx === mid) {
+    const lead = leader();
+    $("tease").textContent = lead ? `Seu DNA tá se formando… tô sentindo um pé no ${lead} 👀`
+      : "Seu DNA tá se formando… mas seu ouvido tá jogando duro 👀";
+  }
+  $("tease").hidden = !(part === 1 && idx >= mid && idx < mid + TEASE_FOR);
   $("status").textContent = "Carregando…";
   player.src = t.u;
   player.currentTime = 0;
@@ -278,8 +318,15 @@ function next() {
   idx++;
   if (idx < queue.length) return playCurrent();
   player.pause();
-  showResult();
+  roundEnd();
 }
+
+const ranked = () => scores().filter(s => s.n).sort((a, b) => b.avg - a.avg);
+// mesma régua do veredito: menos de 0.5 de diferença entre os dois primeiros é empate
+const tied = () => { const r = ranked(); return r.filter(s => r[0].avg - s.avg < .5).length; };   // 1 = sem empate
+const isTie = () => tied() > 1;
+const tiedWord = () => tied() === 2 ? "duas personas" : `${tied()} personas`;
+const leader = () => { const [a, b] = ranked(); return a && (!b || a.avg - b.avg > .01) ? DAYS[a.d].persona : null; };
 
 function scores() {
   return ORDER.map(d => {
@@ -307,14 +354,7 @@ function showResult() {
 
   // código: 1 dígito (0–9) por dia, na ordem fixa ORDER
   const digits = sc.map(s => Math.max(0, Math.min(9, Math.round((s.avg + 1) / 3 * 9)))).join("");
-  $("code").textContent = `#${digits}`;
-
-  const left = part2Left();
-  $("moreBox").hidden = !left;
-  $("moreTxt").textContent = part === 1
-    ? `Tem mais ${left} músicas esperando. Quanto mais você ouve, mais certeiro fica o seu DNA. Pode parar quando quiser.`
-    : `Ainda faltam ${left} músicas da parte 2. Bora terminar?`;
-  $("more").textContent = part === 1 ? "Quero mais músicas" : "Continuar de onde parei";
+  $("code").textContent = `#${digits} · precisão ${PREC[round]}%`;
 
   show("result");
   requestAnimationFrame(() => setTimeout(() => document.querySelectorAll("#dnaBars [data-w]").forEach(el => el.style.width = el.dataset.w + "%"), 50));
